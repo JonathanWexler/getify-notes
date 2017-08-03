@@ -32,7 +32,7 @@ high throughput low latency socket communication with Node.js.
 
 It's not hard to be asynchronous, its hard to coordinate interdependent asynchronous processes running. It's all time-related, on a micro-scale, what makes independent parts of tasks run faster than independent parks of other tasks.
 
-_If you can't understand the system you can't trust it_
+> If you can't understand the system you can't trust it
 
 ## Callbacks
 ```javascript
@@ -46,7 +46,7 @@ We are hoping the system does what it is supposed to do and give us a callback w
 One way to describe a callback: We'll do some stuff now and pause while the system does other work, then we'll come back to continue this task. We mark in the code where the JavaScript engine will continue to run our code.
 
 #### Exercise 1
-Collect responses and print *in order* as soon as they are complete, must create an object to store responses
+Collect responses and print **in order** as soon as they are complete, must create an object to store responses
 
 ```javascript
 function fakeAjax(url,cb) {
