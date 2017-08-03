@@ -50,31 +50,31 @@ Collect responses and print **in order** as soon as they are complete, must crea
 
 ```javascript
 function fakeAjax(url,cb) {
-	var fake_responses = {
-		"file1": "The first text",
-		"file2": "The middle text",
-		"file3": "The last text"
-	};
-	var randomDelay = (Math.round(Math.random() * 1E4) % 8000) + 1000;
+  var fake_responses = {
+    "file1": "The first text",
+    "file2": "The middle text",
+    "file3": "The last text"
+  };
+  var randomDelay = (Math.round(Math.random() * 1E4) % 8000) + 1000;
 
-	console.log("Requesting: " + url);
+  console.log("Requesting: " + url);
 
-	setTimeout(function(){
-		cb(fake_responses[url]);
-	},randomDelay);
+  setTimeout(function(){
+    cb(fake_responses[url]);
+  },randomDelay);
 }
 
 function output(text) {
-	console.log(text);
+  console.log(text);
 }
 
 // **************************************
 // The old-n-busted callback way
 
 function getFile(file) {
-	fakeAjax(file,function(text){
-		// what do we do here?
-	});
+  fakeAjax(file,function(text){
+    // what do we do here?
+  });
 }
 
 // request all files concurrently
@@ -105,7 +105,7 @@ A _thunk_ is a function that has all of the stuff in it it needs, it just needs 
 
 ```javascript
 function add(x,y) {
-return x+y;
+  return x+y;
 }
 // This thunk can be referenced and called to get the specific result we want
 var thunk = function() {
@@ -137,28 +137,28 @@ Turn getFile utility into a makeThunk, must generate a thunk (eagerly), unwrappe
 
 ```javascript
 function fakeAjax(url,cb) {
-	var fake_responses = {
-		"file1": "The first text",
-		"file2": "The middle text",
-		"file3": "The last text"
-	};
-	var randomDelay = (Math.round(Math.random() * 1E4) % 8000) + 1000;
+  var fake_responses = {
+    "file1": "The first text",
+    "file2": "The middle text",
+    "file3": "The last text"
+  };
+  var randomDelay = (Math.round(Math.random() * 1E4) % 8000) + 1000;
 
-	console.log("Requesting: " + url);
+  console.log("Requesting: " + url);
 
-	setTimeout(function(){
-		cb(fake_responses[url]);
-	},randomDelay);
+  setTimeout(function(){
+    cb(fake_responses[url]);
+  },randomDelay);
 }
 
 function output(text) {
-	console.log(text);
+  console.log(text);
 }
 
 // **************************************
 
 function getFile(file) {
-	// return ??
+  // return ??
 }
 
 // request all files concurrently
@@ -176,7 +176,7 @@ thunk1(function() {
     doSomthing(); // this will not run until completion of first doSomething();
   })
 })
-  ```
+```
 This controls flow. We ensure the first thunk contents complete before the next wrapped thunk. There is no longer a time component.
 
 A promise is a time independent wrapper over a function. A promise is a thunk with a nice API.
@@ -209,9 +209,9 @@ Promises are resolved once either as a success or error. They solve the inversio
 
 The Promise model:
 * Start one thing
-  * If error occurs escape to error branch
+* If error occurs escape to error branch
 * Do the next thing
-  * If error occurs escape to error branch
+* If error occurs escape to error branch
 * Return promise
 
 At any point if an error occurs, the following promise is not executed. Success handlers keep skipping until error handler occurs.
@@ -259,7 +259,6 @@ function *gen(){
   yield; // Pauses locally within the generator until next() is called again
   console.log("World");
 }
-
 var it = gen();
 it.next();
 it.next();
@@ -269,4 +268,138 @@ it.next();
 
 The `yield` result will be an object with `value` and `done` boolean.
 
-An iterator returning function is the same as a generator. 
+An iterator returning function is the same as a generator.
+
+### Coroutine
+
+Coroutine will take a generator and hold onto the iterator
+
+```javascript
+function coroutine(gen) {
+  var it = gen();
+  return function () {
+
+  }
+}
+
+var run = coroutine(function *() {
+  var x = 1 + (yield); // pauses and goes back to calling and run(10)
+  var y = 1 + (yield); // pauses and back to calling function (log)
+  yield (x + y);
+});
+
+run(); // Goes to function and stop at yield
+run(10) // Goes to var x declaration and assign it 10
+
+console.log(run(30).value); // Goes var y declaration and assign 30
+```
+
+#### Exercise 7
+Make requests concurrently and unwrap them sequentially
+
+
+```javascript
+function fakeAjax(url,cb) {
+  var fake_responses = {
+    "file1": "The first text",
+    "file2": "The middle text",
+    "file3": "The last text"
+  };
+  var randomDelay = (Math.round(Math.random() * 1E4) % 8000) + 1000;
+
+  console.log("Requesting: " + url);
+
+  setTimeout(function(){
+    cb(fake_responses[url]);
+  },randomDelay);
+}
+
+function output(text) {
+  console.log(text);
+}
+
+// **************************************
+
+// function getFile(file) {
+// 	return ASQ(function(done){
+// 		fakeAjax(file,done);
+// 	});
+// }
+
+function getFile(file) {
+  return new Promise(function(resolve){
+    fakeAjax(file,resolve);
+  });
+}
+
+// function *loadFiles(file) {
+//   output(yield file);
+//   output(yield file);
+//   output(yield file);
+// }
+
+// ASQ().runner(function *loadFiles(){
+// request all files concurrently
+
+// });
+
+//
+// ['file1','file2','file3'].map(getFile).reduce(function (file) {
+//     return loadFiles(file);
+// });
+
+```
+
+### Async/await
+
+An Async function performs this with promises, but there is no way to stop at specific yields like in generators until completion. You can add boolean flags to stop it, but all that is abstracted away in async-await.
+
+```javascript
+async function loadFiles() {
+  var p1 = getFile("file1");
+  var p2 = getFile("file2");
+  var p3 = getFile("file3");
+
+  output(await p1);
+  output(await p2);
+  output(await p3);
+  output("complete");
+
+}
+loadFiles();
+```
+
+Generators let you not resume or `.return()` the generator to stop it in its tracks.
+
+A promise represents in an immutable way that some function will complete. There can be many consumers subscribed to the promise, but any one can cancel their subscription. The other consumers may not want the promise to cancel like that one consumer does.
+
+There should be unregisterable promises, not cancelable ones. There are no longer cancelable promises being added. Right now there is no cancelation option in async-await.
+
+> The promise represents the result, no the operation. You should be able to cancel the operation, not the result
+
+
+A Promise cannot handle multiple inputs. A promise cannot be created on every click event and trigger multiple subscribers to the promise elsewhere. The promise only resolves once.
+
+
+## Observables
+
+There is a proposal to add as a first-class data type like Promises in JS. Netflix rewrote their whole architecture on observables.
+
+This is starting to come down the pipe. Lazy arrays, event streams, etc. values will continue to come in and flow in. _Observables_ are a way of facilitating data flow and chain/filter on that data through various operations.
+
+RX.js (rxjs.codeplex.com) has observables
+
+Reactive Sequences are trimmed down observables
+
+## CSP
+
+Communicating sequential process, sequence of blocking operations, `take` and `put`. Used by Go and closure.
+The reason why its powerful is because there is a race condition between put and take, but the implementation factors out race condition because of blocking semantic.
+
+Allows for communication between processes on the same channel.
+
+CSP go-routines
+
+github.com/getify/a-tale-of-three-lists
+
+Callbacks + Thunks + Promises + Generators + Observables + CSP Go-routines
