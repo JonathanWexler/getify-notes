@@ -458,3 +458,10 @@ Reduce, often known as fold, is fundamentally ordered.
 9. Bonus: write tests for your functions.
 
 https://jsfiddle.net/9h0mntsc/
+
+
+## Fusion
+
+If you have multiple adjacent map calls, even if its readable, the performance problem exists that you are looping over list multiple times and creating multiple temp arrays.
+
+You can compose the functions within the multiple map functions.
