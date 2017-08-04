@@ -366,7 +366,6 @@ _Memoization_, given a set of inputs it will only compute the output once, cache
 Closures memoize their original context. A function that remembers its variables is lexical scope. Being able to execute that elsewhere is closure.
 
 
-
 ```javascript
 function foo() {
   return function() {
@@ -374,8 +373,88 @@ function foo() {
   };
 }
 var f = foo(3);
-f();
-
+f(); // 6
+f(); // 8
 ```
+^ Not referentially transparent
 
 > Closure over a state that changes is not consistent with functional purity
+
+## Summary
+
+Functions:
+* must have direct inputs
+* must have direct output
+* must not have side effects on outside variables/functions
+
+_Referential Transparency_ means you can take a call to a function, computer the output and replace the function call with the output and not change the behavior of the system elsewhere.
+
+A function is pure if for every place it can be called it has referential transparency.
+
+Haskell is strongly typed and compiled with guarantees of referential transparency. Function is called once and return value stored (like memoized functions).
+
+## Generalized to Specialized
+
+Ajax takes 4 inputs: url, method data, callback. But if we can wrap that in a function identifying what we are trying to accomplish it becomes more declarative. This is _specialization_.
+
+More specialized functions lead to more declarative code. Specialization helps abstract to create a semantic boundary (aka read the function name and understand what it is trying to accomplish and expect result).
+
+Partial application and currying: https://medium.com/javascript-scene/curry-or-partial-application-8150044c78b8
+
+They both accomplish the task of specializing functions that are otherwise generalized.
+
+Partial application takes some of the inputs now and the rest later.
+
+```javascript
+function add(x, y) {
+  return x + y;
+}
+function partial(intendedFunction, ...firstArgs) {
+    return function applied(...lastArgs) {
+      return  intendedFunction(...firstArgs, ...lastArgs);
+    }
+}
+
+var addVals = partial(add, 10);
+addVals(32);
+```
+
+Currying take no inputs first and creates a function that expects one input at a time until inputs exhausted.
+https://medium.com/@adambene/currying-in-javascript-es6-540d2ad09400
+
+Maps are when you directly transform each item to a modified list of the same number of items.
+
+```javascript
+function doubleThem(i) { return i * 2;}
+// Here we need to take list and function and make sure the function being performed is pure
+
+transform([1,2,3,4], doubleThem);
+```
+
+Filter behaves by filtering in, by returning values you want to keep.
+
+Reduce, often known as fold, is fundamentally ordered.
+
+#### Exercise 7
+
+# Instructions
+
+1. Write two functions, each which return a fixed number (different from each other) when called.
+
+2. Write an `add(..)` function that takes two numbers and adds them and returns the result. Call `add(..)` with the results of your two functions from (1) and print the result to the console.
+
+3. Write an `add2(..)` that takes two functions instead of two numbers, and it calls those two functions and then sends those values to `add(..)`, just like you did in (2) above.
+
+4. Replace your two functions from (1) with a single function that takes a value and returns a function back, where the returned function will return the value when it's called.
+
+5. Write an `addn(..)` that can take an array of 2 or more functions, and using only `add2(..)`, adds them together. Try it with a loop. Try it without a loop (recursion). Try it with built-in array functional helpers (map/reduce).
+
+6. Start with an array of odd and even numbers (with some duplicates), and trim it down to only have unique values.
+
+7. Filter your array to only have even numbers in it.
+
+8. Map your values to functions, using (4), and pass the new list of functions to the `addn(..)` from (5).
+
+9. Bonus: write tests for your functions.
+
+https://jsfiddle.net/9h0mntsc/
