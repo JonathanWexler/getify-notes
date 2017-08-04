@@ -160,3 +160,73 @@ getId({
   }
 });
 ```
+
+It all comes down to what the reader can understand about your code and instill confidence in the code you've written. The more complicated the code, the more you erode other reader's confidence.
+
+## Arguments
+
+A _higher order function_ takes input functions or produces functions as output.
+
+_Variatic functions_ has indefinite arity. _Arity_ refers to the number of arguments/inputs into a function or operation. A variatic function can be unary, having only one input, even though that input can be broken down further.
+
+>What to do is more important than why it is called
+
+```javascript
+function reverseArgs(fn) {
+  return function reversed(...args ) {
+    return fn(...args.reverse());
+  }
+}
+
+function f(...args) {
+console.log(args)
+}
+
+var g = reverseArgs(f);
+g(1,2,3,4);
+```
+
+Higher order functions here will pass an unknown number of arguments to a function that collects them and passes them to a common function.
+
+## Point-Free
+
+The point free style is making stylistic choices just to make it more readable. We want to be less verbose in the code, but also make sure the code is understood quickly.
+
+_Point_ refers to mathematical functions' use of fixed-point functions. A point refers to a function's input, a function's input is its point. A point-free function is one where you don't need explicitly define its inputs.
+
+
+```javascript
+foo(function (v) {
+  return bar(v);
+})
+
+//can be rewritten as
+foo(bar);
+```
+
+Point-free style allows for quick reference to existing functions without rewriting.
+
+
+```javascript
+function isOdd(v) {
+  return v % 2 == 1;
+}
+
+var isEven = not(isOdd);
+
+// Where not is
+function not(fn) {
+  return function negated(...args) {
+    return !fn(...args);
+  }
+}
+```
+
+## Composition
+
+_Abstraction_ is not to hide a detail, that's encapsulation. Software that is complex is tightly coupled. Simple vs complex is not the same as easy vs. hard.
+
+Rich Hickey - simplicity matters https://www.youtube.com/watch?v=rI8tNMsozo0
+
+
+> Repetition is not a terrible thing
