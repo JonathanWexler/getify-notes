@@ -262,3 +262,120 @@ Most of the time data flow is implicit and hard to track. Functional programming
 > Build a machine that takes smaller machines that take their own arguments to output instead of a new machine from scratch for each custom function
 
 If you write a function whose composition should reflect the functions used later on, then it makes sense to order the arguments in the same order.
+
+NOTE: `compose` and `pipe` and `flow`- `flowRight` in Lodash.
+
+Functional programming is cleaner with these unary functions.
+
+
+> `maybe` monad can be a value or empty- once it is empty the rest of the functions in the chain break off?
+
+
+## Immutability
+
+`const` keyword has nothing to do with functional principles.
+* Prevents you from reassigning things (true)
+* Signals intent for an immutable variable, makes code more readable. (but when the const is changes you lose confidence in the code)
+
+`const` is block scoped. Blocks should be short, but likely these blocks are a whole file.
+
+`Object.freeze` performs a shallow level read-only immutable value. The immutability of a frozen object isn't concerning. This tells the reader of the code that the array cannot be changed in:
+
+
+```javascript
+var z  = Object.freeze([3,4,5, [5,6,4]])
+```
+
+`Immutable.js` removes performance implications for many immutable objects. State changes are explicit. You need to use specific functions to set and get values from immutable objects created with this library.
+
+When you get the input value in a function you need to treat the input as immutable. Never change the input value, especially an object by reference- this is a side effect.
+
+Make a new object/list/variable. The performance tradeoff is work the code confidence in functional programming.
+
+Immutability is about the values, not assignment. Freezing an object will shallowly make an object immutable. Immutable.js or Mori.js will apply a more robust data structure.
+
+> Don't use `const` and `Object.freeze` together to prevent confusion that people have about const performing the immutability.
+
+## Closure
+
+One of the most important and pervasive concepts in computer science, on par with variables and functions themselves.
+
+History of closure goes back to 1950s. Takes a full generation of programmers to catch on to useful features.
+
+> Closure must be truly great because it took two full generations to catch on.
+
+People wanted things to look like Java, even though JavaScript is Scheme under the covers. JavaScript has more in common with Scheme and functional programming languages than C and Object-oriented languages. No one realized it because they didn't talk about functions and closures.
+
+Pretty much any language these days have closure now because it's so important. Closure is at the heart of functional programming.
+
+_Closure_ is when a function remembers the variables around it, continues to access them even if you take that function and execute it in an entirely different scope.
+
+Remember ,lexical scope and functions as values (that they can be passed around). Without closure you wouldn't be able to pass functions around or it would lose track of its variables.
+
+By closing over variables, using a function within another function's scope, allows for referencing variables outside of itself.
+
+A click handler's callback referenced elements outside of its environment.
+
+#### Exercise 4
+
+```javascript
+function foo(x, y) {
+  return function inner() {
+      return x + y;
+  }
+}
+
+var x = foo(3,4);
+
+x();	// 7
+x();	// 7
+```
+
+We have a high degree of confidence that `foo` and the inner function are pure. But they are lazy function because they aren't executed until `x()`. The benefit to lazy operations is deferral of work until it needs to be done. For example, only running when user clicks. Tradeoff is every time we need it we redo the work.
+
+An eager approach is to do the work once ahead of time by adding a local variable to `foo`.
+
+```javascript
+function foo(x, y) {
+  let sum = x + y;
+  return function inner() {
+      return sum;
+  }
+}
+// here the work is done once at this line below
+var x = foo(3,4);
+```
+Or do the work but only once. Check if it is still undefined and set once.
+
+```javascript
+function foo(x, y) {
+  let sum;
+  return function inner() {
+    if (sum === undefined) sum = x + y;
+    return sum;
+  }
+}
+// here the work is done once at this line below
+var x = foo(3,4);
+```
+
+This might make sense but it is less obviously pure. Maybe more imperative?
+
+_Memoization_, given a set of inputs it will only compute the output once, cache, and give cached results in the future. Save more performance than lose overall.
+
+Closures memoize their original context. A function that remembers its variables is lexical scope. Being able to execute that elsewhere is closure.
+
+
+
+```javascript
+function foo() {
+  return function() {
+    return x++ * 2;
+  };
+}
+var f = foo(3);
+f();
+
+```
+
+> Closure over a state that changes is not consistent with functional purity
