@@ -124,7 +124,7 @@ In pure functions state changes are explicit- when you want to use certain funct
 const y = 1;
 
 function foo() {
-return x+y;
+  return x+y;
 }
 foo(1);
 ```
@@ -179,7 +179,7 @@ function reverseArgs(fn) {
 }
 
 function f(...args) {
-console.log(args)
+  console.log(args)
 }
 
 var g = reverseArgs(f);
@@ -228,5 +228,37 @@ _Abstraction_ is not to hide a detail, that's encapsulation. Software that is co
 
 Rich Hickey - simplicity matters https://www.youtube.com/watch?v=rI8tNMsozo0
 
-
 > Repetition is not a terrible thing
+
+We need a semantic boundary between how it is computed and what we do. Abstraction is that semantic boundary, the name of the function.
+
+```javascript
+function sum(x,y) {
+  return x + y;
+}
+
+function mult(x,y) {
+  return x + y;
+}
+// This x_y is an intermediary step, so maybe it isn't necessary
+// so instead sum(mult(3, 4), 5);
+var x_y = mult(3, 4);
+sum(x_y, 5);
+```
+
+Why can't we take a number of operations and wrap them into one function? This way we can just think about input and output.
+
+```javascript
+// ...
+function sumAndMult(x,y,z) {
+  return sum(mult(x, y), z);
+}
+```
+
+Now users of `sumAndMult` don't need to think about what is happening inside.
+
+Most of the time data flow is implicit and hard to track. Functional programming is about being explicit about the flow of data.
+
+> Build a machine that takes smaller machines that take their own arguments to output instead of a new machine from scratch for each custom function
+
+If you write a function whose composition should reflect the functions used later on, then it makes sense to order the arguments in the same order.
