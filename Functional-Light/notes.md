@@ -1,5 +1,7 @@
 # Functional-Light JavaScript
 
+https://github.com/getify/Functional-Light-JS
+
 <!-- Start with intro, why you got into teaching and anecdote about the topic. Why are we learning it: because we wouldn't know it otherwise until we really try to understand it well enough to explain it to others. -->
 
 > Our industry incentivizes a shallow enough amount to get the job done but not much more than that
